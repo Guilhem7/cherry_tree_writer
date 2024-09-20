@@ -3,3 +3,4 @@ __pycache__/
 *.ctb
 images/
 tests/
+test.py
