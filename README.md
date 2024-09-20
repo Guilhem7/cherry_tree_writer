@@ -3,7 +3,7 @@ Simple library to write cherry_tree document
 
 ## Usage
 ```python
-from src.ctb_writer import CherryTree, CherryTreeNodeBuilder
+from ctb_writer import CherryTree, CherryTreeNodeBuilder
 
 ctb_document = CherryTree("my_notes.ctb") # Init the cherry tree document
 root_id = ctb_document.add_child("Root node") # Add a node with a name
@@ -19,4 +19,11 @@ new_node = CherryTreeNodeBuilder("New node").icon("settings")\
 ctb_document.add_child(new_node, parent_id=root_id) # Add this node as the child of the first root node
 ctb_document.save() # Save your CherryTree in "my_notes.ctb"
 
+```
+
+## Installation
+```bash
+git clone https://github.com/Guilhem7/cherry_tree_writer.git
+cd cherry_tree_writer
+pip3 install .
 ```
