@@ -16,5 +16,11 @@ def get_icon(icon_name, read_only=False):
 	:return: The value of the icon for cherry tree
 	"""
 	if isinstance(icon_name, int):
-		return icon_name
-	return icons.get(icon_name.lower(), 0)
+		value = icon_name
+	else:
+		value = icons.get(icon_name.lower(), 0)
+
+	if read_only:
+		return value + 1
+	return value
+
