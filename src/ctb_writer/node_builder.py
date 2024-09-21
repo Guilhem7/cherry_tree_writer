@@ -41,6 +41,13 @@ class CherryTreeNodeBuilder:
         self.node.add_image(filename, position=position)
         return self
 
+    def set_read_only(self):
+        """
+        Set the node as read only
+        """
+        self.node.is_ro = 1
+        return self
+
     def get_node(self):
         """
         Return the associated node

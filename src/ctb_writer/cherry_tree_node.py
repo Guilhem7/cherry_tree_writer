@@ -15,13 +15,14 @@ class CherryTreeNode:
     """
     Class holding node data
     """
-    def __init__(self, name, xml=None, father_id=0, icon=0, images=None, children=None):
+    def __init__(self, name, xml=None, father_id=0, icon=0, is_ro=0, images=None, children=None):
         self.name = name
         self.icon = icon
         self.father_id = father_id
         self.images = [] if images is None else images
         self.children = [] if children is None else children
         self.node_id = None
+        self.is_ro = is_ro
         self.xml = ET.fromstring(self.get_base_xml()) if xml is None else xml
 
     @staticmethod

@@ -1,6 +1,7 @@
 """
 Gather some assets of the cherry tree doc
 """
+import warnings
 from .node_icon import icons
 
 def get_icon(icon_name, read_only=False):
@@ -15,10 +16,18 @@ def get_icon(icon_name, read_only=False):
 
 	:return: The value of the icon for cherry tree
 	"""
+	prefix_icon = "ct_"
 	if isinstance(icon_name, int):
 		value = icon_name
 	else:
-		value = icons.get(icon_name.lower(), 0)
+		if not icon_name.startswith(prefix_icon):
+			icon_name = prefix_icon + icon_name
+		value = icons.get(icon_name.lower())
+		if not value:
+			warnings.warn(f"Icon {icon_name} not found, refers to:\n"
+						  "https://github.com/Guilhem7/cherry_tree_writer/blob/main/src/ctb_writer/assets/node_icon.py",
+						  )
+			value = 0
 
 	if read_only:
 		return value + 1

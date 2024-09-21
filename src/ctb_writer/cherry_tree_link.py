@@ -8,6 +8,8 @@ from time import time
 class CherryTreeLink:
     def __init__(self, name):
         self.name = name
+        if os.path.exists(self.name):
+            raise ValueError(f"File {self.name} already exists, aborting") from None
         self.con = sqlite3.connect(self.name)
         self.cursor = self.con.cursor()
         self.init()
@@ -90,7 +92,7 @@ class CherryTreeLink:
                              node.get_xml(),
                              "custom-colors",
                              None,
-                             node.icon,
+                             node.icon | node.is_ro,
                              1,
                              0,
                              0,

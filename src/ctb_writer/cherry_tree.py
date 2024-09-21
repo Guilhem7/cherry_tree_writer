@@ -1,7 +1,6 @@
 """
 This class allows to create a new CherryTree and manipulate it
 """
-import os
 import xml.etree.ElementTree as ET
 from .cherry_tree_node import CherryTreeNode
 from .cherry_tree_link import CherryTreeLink
@@ -75,7 +74,7 @@ class CherryTree:
             node_res.append(node)
         return node.node_id
 
-    def add_child(self, node, text="", icon="", parent_id=0):
+    def add_child(self, node, text="", icon="", is_ro=0, parent_id=0):
         """
         Add a child to the parent
 
@@ -92,7 +91,7 @@ class CherryTree:
             return self._add_child_node(node, parent_id)
 
         elif isinstance(node, str):
-            new_node = CherryTreeNode(node, father_id=parent_id)
+            new_node = CherryTreeNode(node, is_ro=is_ro, father_id=parent_id)
             if text:
                 new_node.add_text(text)
 
