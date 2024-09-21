@@ -14,6 +14,7 @@ ctb_document.add_child("Root node 2", text="Content of this node", icon="plus") 
 # Can also use .image("path_to_image")
 new_node = CherryTreeNodeBuilder("New node").icon("execute")\
                                             .text("Content of the node\n")\
+                                            .text("Text append to the node again")\
                                             .get_node() # build the node from the previous infos
 
 ctb_document.add_child(new_node, parent_id=root_id) # Add this node as the child of the first root node
