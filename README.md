@@ -1,5 +1,5 @@
-# cherry_tree_writer
-Simple library to write cherry_tree document
+# Cherrytree Writer
+Simple library to write a **Cherrytree** document
 
 ## Usage
 ```python
@@ -12,7 +12,7 @@ ctb_document.add_child("child node1", parent_id=root_id) # Add a child to the ro
 ctb_document.add_child("Root node 2", text="Content of this node", icon="plus") # Add another root node, with some meta_infos
 
 # Can also use .image("path_to_image")
-new_node = CherryTreeNodeBuilder("New node").icon("ct_execute")\
+new_node = CherryTreeNodeBuilder("New node").icon("execute")\
                                             .text("Content of the node\n")\
                                             .get_node() # build the node from the previous infos
 
@@ -27,3 +27,16 @@ git clone https://github.com/Guilhem7/cherry_tree_writer.git
 cd cherry_tree_writer
 pip3 install .
 ```
+
+## Other properties
+**Nodes** can be created with the following properties:
+ - Icon: The icon to use for the node (see _**assets/node_icons.py**_)
+ - Text: The text inside the node (no formatting available by now)
+ - Images: The images inside the node
+ - Read-Only: Whether or not the node can be edited
+
+## TODO
+1. Manage codebox
+2. Manage Tables
+3. Manage text formatting
+
