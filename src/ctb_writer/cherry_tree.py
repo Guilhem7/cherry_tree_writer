@@ -70,6 +70,7 @@ class CherryTree:
         if parent_id == 0:
             self.nodes.append(node)
         else:
+            node.father_id = parent_id
             node_res = self.get_node_by_id(parent_id)
             node_res.append(node)
         return node.node_id
