@@ -29,9 +29,15 @@ cd cherry_tree_writer
 pip3 install .
 ```
 
+## Icons
+List icons
+```bash
+python3 -m ctb_writer.assets 
+```
+
 ## Other properties
 **Nodes** can be created with the following properties:
- - Icon: The icon to use for the node (see _**assets/node_icons.py**_)
+ - Icon: The icon to use for the node (with or without the prefix **_ct__**)
  - Text: The text inside the node (no formatting available by now)
  - Images: The images inside the node
  - Read-Only: Whether or not the node can be edited
