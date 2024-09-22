@@ -3,29 +3,48 @@ This file allows to add beautify text to cherrytree
 """
 import xml.etree.ElementTree as ET
 import re
+from ctb_writer.styles import styles
+
 
 COLOR_RE = re.compile(r"#[0-9a-f]{6}", re.I)
 
 def color(func):
     """
-    Check that args given are color
+    Check that args given is a color
     """
     def check_color(color):
-        if not (isinstance(color, str) or isinstance(color, bytes)):
-            return None
-
         if re.match(COLOR_RE, color):
             return True
-        raise ValueError("A color with the form '#af45df' is expected") from None
+        raise ValueError("A color with the format '#af45df' is expected") from None
 
     def wrapper_is_color(*args, **kwargs):
-        for arg in args:
-            check_color(arg)
+        new_args = []
+        for i, arg in enumerate(args):
+            if isinstance(arg, bytes):
+                arg = arg.decode()
 
-        for arg in kwargs.values():
-            check_color(arg)
+            if isinstance(arg, str):
+                resolved_color = styles.get(arg.lower())
+                if resolved_color:
+                    arg = resolved_color
+                else:
+                    check_color(arg)
 
-        return func(*args, **kwargs)
+            new_args.append(arg)
+
+
+        for key, arg in kwargs.items():
+            if isinstance(arg, bytes):
+                arg = arg.decode()
+
+            if isinstance(arg, str):
+                resolved_color = styles.get(arg.lower())
+                if resolved_color:
+                    kwargs[i] = resolved_color
+                else:
+                    check_color(arg)
+
+        return func(*new_args, **kwargs)
     return wrapper_is_color
 
 
@@ -36,8 +55,6 @@ class CherryTreeRichtext:
      - Colors
      - Other style
     """
-    COLOR_RE = re.compile(r"#[0-9a-f]{6}", re.I)
-
     def __init__(self, text, bold=False, fg=None, bg=None):
         self.text = text
         self.bold = bold
