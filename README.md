@@ -53,6 +53,11 @@ However, each colors must match the following regex:
 #[0-9a-fA-F]{6}
 ```
 
+Or be a predefined style:
+```bash
+python3 -m ctb_writer.styles
+```
+
 
 ## Other properties
 **Nodes** can be created with the following properties:
@@ -64,6 +69,5 @@ However, each colors must match the following regex:
 ## TODO
 1. Manage codebox
 2. Manage Tables
-3. Manage text formatting | Done
-4. Add alias for color
-
+3. :white_check_mark: Manage text formatting
+4. :white_check_mark: Add alias for color
