@@ -24,7 +24,7 @@ new_node = NodeBuilder("New node").icon("execute")\
 
 # Add node with formatting
 other_node = NodeBuilder("Other node", color='#fg4895', bold=True)\
-                                                    .text("", style={"bold":True, "fg":"#fg4895","bg": "#ffffff"})\
+                                                    .text("Highlited text\n", style={"bold":True, "fg":"#fg4895","bg": "#ffffff"})\
                                                     .get_node()
 
 ctb_document.add_child(new_node, parent_id=root_id) # Add this node as the child of the first root node
