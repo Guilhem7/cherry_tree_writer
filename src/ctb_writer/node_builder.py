@@ -10,8 +10,14 @@ class CherryTreeNodeBuilder:
     """
     Builder for a cherry tree node
     """
-    def __init__(self, name):
+    def __init__(self, name, color=None, bold=False):
         self.node = CherryTreeNode(name)
+
+        if bold:
+            self.node.set_bold_title()
+
+        if color:
+            self.node.set_title_color(color)
 
     def icon(self, name):
         """
@@ -20,11 +26,11 @@ class CherryTreeNodeBuilder:
         self.node.icon = get_icon(name)
         return self
 
-    def text(self, text):
+    def text(self, text, style={}):
         """
         Add the Text to a node
         """
-        self.node.add_text(text)
+        self.node.add_text(text, attrib=style)
         return self
 
     def image(self, filename, position=-1):

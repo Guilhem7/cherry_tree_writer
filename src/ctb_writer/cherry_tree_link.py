@@ -6,6 +6,10 @@ import os
 from time import time
 
 class CherryTreeLink:
+    """
+    Cherry Tree link to the database
+    ./src/ct/ct_storage_sqlite.cc --> Some implementations of the columns
+    """
     def __init__(self, name):
         self.name = name
         if os.path.exists(self.name):
@@ -92,8 +96,8 @@ class CherryTreeLink:
                              node.get_xml(),
                              "custom-colors",
                              None,
-                             node.icon | node.is_ro,
-                             1,
+                             _ColumnConvert.to_ro(node),
+                             _ColumnConvert.to_richtext(node),
                              0,
                              0,
                              node.has_image,
@@ -202,4 +206,34 @@ class CherryTreeLink:
             ts_lastsave INTEGER
             )
             """)
+
+class _ColumnConvert:
+    """
+    This class allows to convert some column to the format expected
+    """
+    @staticmethod
+    def to_ro(node):
+        """
+        Extract the information from the node to
+        add it as ro
+        """
+        return node.icon | node.is_ro
+
+    @staticmethod
+    def to_richtext(node):
+        """
+        Extract the information from the node to
+        add it as richtext
+        """
+        title_style = node.get_title_style()
+        is_richtext = 1
+        is_bold = 1 if title_style.get('bold', False) else 0
+        is_foreground = 1 if title_style.get('color', None) is not None else 0
+        color_int = 0
+
+        if is_foreground:
+            forecolor = title_style.get('color')[1:]
+            color_int = int(forecolor, 16) << 3
+
+        return color_int | is_foreground << 2 | is_bold << 1 | is_richtext
 

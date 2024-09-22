@@ -3,6 +3,7 @@ Class representing a cherry tree node
 """
 from os.path import expanduser
 from dataclasses import dataclass
+from .beautify import CherryTreeRichtext, color
 import xml.etree.ElementTree as ET
 
 @dataclass
@@ -16,14 +17,37 @@ class CherryTreeNode:
     Class holding node data
     """
     def __init__(self, name, xml=None, father_id=0, icon=0, is_ro=0, images=None, children=None):
+        self.node_id = None
         self.name = name
+        self.title_style = {"color": None, "bold": False}
+
+        self.is_ro = is_ro
         self.icon = icon
+
         self.father_id = father_id
         self.images = [] if images is None else images
         self.children = [] if children is None else children
-        self.node_id = None
-        self.is_ro = is_ro
+
         self.xml = ET.fromstring(self.get_base_xml()) if xml is None else xml
+
+    @color
+    def set_title_color(self, color):
+        """
+        Set the color of the title
+        """
+        self.title_style["color"] = color
+
+    def set_bold_title(self):
+        """
+        Set the Node title as bold
+        """
+        self.title_style["bold"] = True
+
+    def get_title_style(self):
+        """
+        Used to access the style of the title
+        """
+        return self.title_style
 
     @staticmethod
     def get_base_xml():
@@ -43,15 +67,14 @@ class CherryTreeNode:
             raise ValueError("add_children method expect a list as parameter")
         self.children.extend(children)
 
-    def add_text(self, text):
+    def add_text(self, text, attrib={}):
         """
         Add rich text to the node
 
         :param text: The text to add to the node
         :type text: str
         """
-        richtext = ET.Element("rich_text")
-        richtext.text = text
+        richtext = CherryTreeRichtext.from_attributes(text, attrib).get_xml()
         self.xml.append(richtext)
 
     def add_image(self, image_name, position=-1):
