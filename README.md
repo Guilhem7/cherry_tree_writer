@@ -49,7 +49,9 @@ python3 -m ctb_writer.assets
 ## Colors
 By now colors can be applied on text and on node title.
 However, each colors must match the following regex:
- - '#[0-9a-fA-F]{6}'
+```
+#[0-9a-fA-F]{6}
+```
 
 
 ## Other properties
@@ -63,4 +65,5 @@ However, each colors must match the following regex:
 1. Manage codebox
 2. Manage Tables
 3. Manage text formatting | Done
+4. Add alias for color
 
