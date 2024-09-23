@@ -4,7 +4,7 @@ This class allows to create a new CherryTree and manipulate it
 import xml.etree.ElementTree as ET
 from .cherry_tree_node import CherryTreeNode
 from .cherry_tree_link import CherryTreeLink
-from .assets import get_icon
+from .icons import get_icon
 
 class CherryTree:
     """

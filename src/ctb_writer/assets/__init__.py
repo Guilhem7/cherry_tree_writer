@@ -1,35 +1,100 @@
 """
-Gather some assets of the cherry tree doc
+Objects available on Cherry Tree such as: table, codebox and images
+
+https://stackoverflow.com/questions/51575931/class-inheritance-in-python-3-7-dataclasses
 """
-import warnings
-from .node_icon import icons
+import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 
-def get_icon(icon_name, read_only=False):
-	"""
-	Return the icon associated to a string
+__all__ = ["CherryTreeCodebox",
+           "CherryTreeTable",
+           "CherryTreeImage"]
 
-	:param icon_name: The name of the icon
-	:type icon_name: Union[str, int]
 
-	:param read_only: Whether or not to set the node as read_only
-	:type read_only: boolean (default: False)
+### Cherry Tree default fields for object
+@dataclass
+class _CherryTreePositionalObject:
+    position: int
 
-	:return: The value of the icon for cherry tree
-	"""
-	prefix_icon = "ct_"
-	if isinstance(icon_name, int):
-		value = icon_name
-	else:
-		if not icon_name.startswith(prefix_icon):
-			icon_name = prefix_icon + icon_name
-		value = icons.get(icon_name.lower())
-		if not value:
-			warnings.warn(f"Icon {icon_name} not found, refers to:\n"
-						  "https://github.com/Guilhem7/cherry_tree_writer/blob/main/src/ctb_writer/assets/node_icon.py",
-						  )
-			value = 0
+@dataclass
+class _CherryTreePositionalObjectDefault:
+    justification: str = "left"
 
-	if read_only:
-		return value + 1
-	return value
+@dataclass
+class _CherryTreeObject(_CherryTreePositionalObjectDefault, _CherryTreePositionalObject):
+    pass
 
+### Cherry Tree codebox
+@dataclass
+class _CherryTreeCodeboxDefault(_CherryTreeObject):
+    width: int = 700
+    height: int = 400
+    is_width_pix: int = 1 # Size is given in pixels or in percent
+    highlight_brackets: int = 1
+    show_line_numbers: int = 1
+
+@dataclass
+class _CherryTreeCodeboxBase():
+    txt: str
+    syntax: str
+
+@dataclass
+class CherryTreeCodebox(_CherryTreeCodeboxDefault, _CherryTreeCodeboxBase):
+    pass
+
+### Cherry Tree table
+@dataclass
+class _CherryTreeTableBase():
+    content: list
+
+@dataclass
+class _CherryTreeTableDefault(_CherryTreeObject):
+    col_min: int = 250
+    col_max: int = 250
+
+@dataclass
+class CherryTreeTable(_CherryTreeTableDefault, _CherryTreeTableBase):
+    """
+    Class for representing a Table in cherry tree
+
+    In ctb:
+      <?xml version="1.0" encoding="UTF-8"?>
+        <table col_widths="0,0,0">
+           <row><cell>a1</cell>
+                <cell>aa1</cell>
+                <cell>aaa1</cell>
+            </row><row>
+                <cell>a2</cell>
+                <cell>aa2</cell>
+                <cell>aaa2</cell>
+            </row>
+        </table>
+    """
+    def get_table(self):
+        """
+        Return the table as xml string
+        """
+        if not self.content:
+            return ""
+        num_col = len(self.content[0])
+        header_width = "0,"*num_col
+        xml = ET.Element("table", attrib={"col_widths": header_width[:-1]})
+        for row in self.content:
+            new_row = ET.Element("row")
+            for cell in row:
+                new_cell = ET.Element("cell")
+                new_cell.text = cell
+                new_row.append(new_cell)
+            xml.append(new_row)
+        return ET.tostring(xml, encoding="UTF-8", xml_declaration=True)
+
+### Cherry Tree image
+@dataclass
+class _CherryTreeImageBase():
+    """Class holding image information"""
+    data: bytes
+
+@dataclass
+class CherryTreeImage(_CherryTreeObject, _CherryTreeImageBase):
+    """Class holding image information"""
+    pass

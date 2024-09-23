@@ -2,7 +2,7 @@
 Class that allow to build a node given the parameters wanted
 """
 from os.path import expanduser
-from .assets import get_icon
+from .icons import get_icon
 from .cherry_tree_node import CherryTreeNode, CherryTreeImage
 import xml.etree.ElementTree as ET
 
@@ -33,7 +33,7 @@ class CherryTreeNodeBuilder:
         self.node.add_text(text, attrib=style)
         return self
 
-    def image(self, filename, position=-1):
+    def image(self, filename, position=-1, justification="left"):
         """
         Insert an image in the node, at the given position, default position is
         "-1" that refers to the end of text
@@ -44,7 +44,27 @@ class CherryTreeNodeBuilder:
         :param position: The position of the images in the text
         :type position: int (default: -1)
         """
-        self.node.add_image(filename, position=position)
+        self.node.add_image(filename, position=position, justification=justification)
+        return self
+
+    def codebox(self, text, syntax, **kwargs):
+        """
+        Add a codebox to the given node
+
+        :param text: The content of the codebox
+        :type text: str
+
+        :param syntax: The syntax to use for coloring code
+        :type syntax: str
+        """
+        self.node.add_codebox(text, syntax.lower(), **kwargs)
+        return self
+
+    def table(self, content, **kwargs):
+        """
+        Add a table to the node
+        """
+        self.node.add_table(content, **kwargs)
         return self
 
     def set_read_only(self):

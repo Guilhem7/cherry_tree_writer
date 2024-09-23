@@ -4,13 +4,8 @@ Class representing a cherry tree node
 from os.path import expanduser
 from dataclasses import dataclass
 from .beautify import CherryTreeRichtext, color
+from .assets import *
 import xml.etree.ElementTree as ET
-
-@dataclass
-class CherryTreeImage:
-    """Class holding image information"""
-    data: bytes
-    position: int
 
 class CherryTreeNode:
     """
@@ -26,6 +21,9 @@ class CherryTreeNode:
 
         self.father_id = father_id
         self.images = [] if images is None else images
+        self.codebox = []
+        self.tables = []
+
         self.children = [] if children is None else children
 
         self.xml = ET.fromstring(self.get_base_xml()) if xml is None else xml
@@ -77,7 +75,7 @@ class CherryTreeNode:
         richtext = CherryTreeRichtext.from_attributes(text, attrib).get_xml()
         self.xml.append(richtext)
 
-    def add_image(self, image_name, position=-1):
+    def add_image(self, image_name, position=-1, justification="left"):
         """
         Add an image to the text
 
@@ -98,8 +96,35 @@ class CherryTreeNode:
             # In this case, append the image at the end of the text
             position = self._get_text_length()
 
-        self.images.append(CherryTreeImage(image, position=position))
-        return self
+        self.images.append(CherryTreeImage(image, position=position, justification=justification))
+
+    def add_codebox(self, text, syntax, position=-1, **kwargs):
+        """
+        Add a codebox to the text with the syntax given
+
+        :param text: The content of the codebox
+        :type text: str
+
+        :param syntax: The syntax to use for the code
+        :type syntax: str
+        """
+        if position < 0:
+            # In this case, append the codebox at the end of the text
+            position = self._get_text_length()
+
+        self.codebox.append(CherryTreeCodebox(text, syntax, position=position, **kwargs))
+
+    def add_table(self, content, position=-1, **kwargs):
+        """
+        Add a table to the node
+
+        :param content: The table content
+        :type content: List[List]
+        """
+        if position < 0:
+            # In this case, append the table at the end of the text
+            position = self._get_text_length()
+        self.tables.append(CherryTreeTable(content, position=position, **kwargs))
 
     def _get_text_length(self):
         """
@@ -148,11 +173,22 @@ class CherryTreeNode:
         """
         return 0 if len(self.images) == 0 else 1
 
+    @property
+    def has_codebox(self):
+        """
+        Check whether or not the node has codebox
+        """
+        return 0 if len(self.codebox) == 0 else 1
+
+    @property
+    def has_table(self):
+        """
+        Check whether or not the node has codebox
+        """
+        return 0 if len(self.tables) == 0 else 1
+
     def get_xml(self):
         """Return the xml containing in the node which is xml by default"""
         if self.xml is None:
             return self.get_base_xml()
         return ET.tostring(self.xml, encoding="UTF-8", xml_declaration=True)
-
-
-

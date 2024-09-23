@@ -9,6 +9,10 @@ class CherryTreeLink:
     """
     Cherry Tree link to the database
     ./src/ct/ct_storage_sqlite.cc --> Some implementations of the columns
+
+    TODO:
+     - Create a parser that can load existing ctb Database
+     - Use INSERT or REPLACE and CREATE TABLE IF NOT EXISTS
     """
     def __init__(self, name):
         self.name = name
@@ -61,7 +65,35 @@ class CherryTreeLink:
                             (node_id, offset, justification, png)
                             VALUES (?, ?, ?, ?)
                             """,
-                            (node.node_id, image.position, "left", image.data)
+                            (node.node_id, image.position, image.justification, image.data)
+                            )
+
+    def _save_codebox(self, node):
+        """
+        Save codebox of a node
+        """
+        for codebox in node.codebox:
+            self.cursor.execute(
+                            """INSERT INTO codebox
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """,
+                            (node.node_id, codebox.position, codebox.justification,
+                             codebox.txt, codebox.syntax, codebox.width,
+                             codebox.height, codebox.is_width_pix, codebox.highlight_brackets,
+                             codebox.show_line_numbers)
+                            )
+
+    def _save_table(self, node):
+        """
+        Save table of a node
+        """
+        for table in node.tables:
+            self.cursor.execute(
+                            """INSERT INTO grid
+                            VALUES (?, ?, ?, ?, ?, ?)
+                            """,
+                            (node.node_id, table.position, table.justification,
+                             table.get_table(), table.col_min, table.col_max)
                             )
 
     def _save_node_recurse(self, nodes):
@@ -98,8 +130,8 @@ class CherryTreeLink:
                              None,
                              _ColumnConvert.to_ro(node),
                              _ColumnConvert.to_richtext(node),
-                             0,
-                             0,
+                             node.has_codebox,
+                             node.has_table,
                              node.has_image,
                              0,
                              int(time())-2,
@@ -107,6 +139,13 @@ class CherryTreeLink:
                             )
             if node.has_image:
                 self._save_images(node)
+
+            if node.has_codebox:
+                self._save_codebox(node)
+
+            if node.has_table:
+                self._save_table(node)
+
             self.con.commit()
 
     def _save_children_recurse(self, nodes):
