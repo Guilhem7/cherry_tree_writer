@@ -33,6 +33,19 @@ ctb_document.save() # Save your CherryTree in "my_notes.ctb"
 
 ```
 
+It is also possible to add other type of nodes:
+```python
+from ctb_writer import CherryTree, CherryTreeNodeBuilder as NodeBuilder
+
+ctb_document = CherryTree("my_notes.ctb") # Init the cherry tree document
+root_id = ctb_document.add_child("Root node") # Add a node with a name
+
+python_code = NodeBuilder("script", type="code", syntax="python", color="goldenrod").icon("python").text("print('I am a python code')\n")
+
+ctb_document.add_child(python_code.get_node(), parent_id=root_id)
+ctb_document.save()
+```
+
 ## Installation
 ```bash
 git clone https://github.com/Guilhem7/cherry_tree_writer.git
