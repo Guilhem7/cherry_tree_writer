@@ -10,7 +10,7 @@ if os.path.exists("my_notes.ctb"):
     print("The file <my_notes.ctb> already exists")
     exit(0)
 
-ctb_document = CherryTree("my_notes.ctb") # Init the cherry tree document
+ctb_document = CherryTree() # Init the cherry tree document
 root_id = ctb_document.add_child("Root node") # Add a node with a name
 
 ctb_document.add_child("child node1", parent_id=root_id) # Add a child to the root node
@@ -29,7 +29,7 @@ other_node = NodeBuilder("Other node", color='#fg4895', bold=True)\
 
 ctb_document.add_child(new_node, parent_id=root_id) # Add this node as the child of the first root node
 ctb_document.add_child(other_node, parent_id=new_node)
-ctb_document.save() # Save your CherryTree in "my_notes.ctb"
+ctb_document.save("my_notes.ctb") # Save your CherryTree in "my_notes.ctb"
 
 ```
 
@@ -37,7 +37,7 @@ It is also possible to add other type of nodes:
 ```python
 from ctb_writer import CherryTree, CherryTreeNodeBuilder as NodeBuilder
 
-ctb_document = CherryTree("my_notes.ctb") # Init the cherry tree document
+ctb_document = CherryTree() # Init the cherry tree document
 root_id = ctb_document.add_child("Root node") # Add a node with a name
 
 python_code = NodeBuilder("script", type="code", syntax="python", color="goldenrod")\
@@ -46,7 +46,7 @@ python_code = NodeBuilder("script", type="code", syntax="python", color="goldenr
                          .get_node()
 
 ctb_document.add_child(python_code, parent_id=root_id)
-ctb_document.save()
+ctb_document.save("my_notes.ctb")
 ```
 
 ## Installation

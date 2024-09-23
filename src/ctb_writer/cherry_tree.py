@@ -8,11 +8,10 @@ from .icons import get_icon
 
 class CherryTree:
     """
-    Create a cherryTree
+    Create a cherryTree document
     """
-    def __init__(self, name):
+    def __init__(self):
         self.nodes = []
-        self.ctb_sql_link = CherryTreeLink(name)
         self.last_id = 0
 
     def __str__(self):
@@ -103,8 +102,10 @@ class CherryTree:
 
         raise ValueError(f"Cannot insert node with type {type(node)}")
 
-    def save(self):
+    def save(self, name):
         """
         Save the nodes to a cherrytree file
         """
+        self.ctb_sql_link = CherryTreeLink(name)
+        self.ctb_sql_link.init()
         self.ctb_sql_link.save(self.nodes)

@@ -20,7 +20,6 @@ class CherryTreeLink:
             raise ValueError(f"File {self.name} already exists, aborting") from None
         self.con = sqlite3.connect(self.name)
         self.cursor = self.con.cursor()
-        self.init()
 
     @property
     def name(self):
