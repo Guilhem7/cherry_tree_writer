@@ -43,7 +43,7 @@ pip3 install .
 ## Icons
 List icons
 ```bash
-python3 -m ctb_writer.assets 
+python3 -m ctb_writer.icons 
 ```
 
 ## Colors
@@ -67,7 +67,9 @@ python3 -m ctb_writer.styles
  - Read-Only: Whether or not the node can be edited
 
 ## TODO
-1. Manage codebox
-2. Manage Tables
+1. :white_check_mark: Manage codebox
+2. :white_check_mark: Manage Tables
 3. :white_check_mark: Manage text formatting
 4. :white_check_mark: Add alias for color
+5. Parse an existing Cherry tree document
+6. Allows to save with password
