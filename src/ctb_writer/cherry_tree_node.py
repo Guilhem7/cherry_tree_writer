@@ -7,11 +7,11 @@ from .beautify import CherryTreeRichtext, color
 from .assets import *
 import xml.etree.ElementTree as ET
 
-class CherryTreeNode:
+class _CherryTreeNodeBase:
     """
-    Class holding node data
+    Base attributes for a cherry tree node
     """
-    def __init__(self, name, xml=None, father_id=0, icon=0, is_ro=0, images=None, children=None):
+    def __init__(self, name, father_id=0, icon=0, is_ro=0, children=None, tags=None):
         self.node_id = None
         self.name = name
         self.title_style = {"color": None, "bold": False}
@@ -20,13 +20,35 @@ class CherryTreeNode:
         self.icon = icon
 
         self.father_id = father_id
-        self.images = [] if images is None else images
-        self.codebox = []
-        self.tables = []
-
         self.children = [] if children is None else children
+        self.tags = [] if tags is None else tags
 
-        self.xml = ET.fromstring(self.get_base_xml()) if xml is None else xml
+    def append(self, child):
+        """Add a children to the list"""
+        self.children.append(child)
+
+    def get_all_children_recurse(self):
+        """
+        return the list of all children of the current node
+        recursively, and include the root node as the first element
+        """
+        all_children = [self]
+        for child in self.children:
+            all_children.extend(child.get_all_children_recurse())
+        return all_children
+
+    def __iter__(self):
+        """Iter through all child nodes"""
+        for node in self.get_all_children_recurse():
+            yield node
+
+    def get_tags(self):
+        """
+        Return the tags of the node for the db
+        """
+        if not self.tags:
+            return None
+        return " ".join(self.tags)
 
     @color
     def set_title_color(self, color):
@@ -46,6 +68,31 @@ class CherryTreeNode:
         Used to access the style of the title
         """
         return self.title_style
+
+    @property
+    def is_root_node(self):
+        """Check if a node is the root node"""
+        return self.father_id == 0
+
+    @property
+    def is_last_node(self):
+        """Check if a node is the last one"""
+        return len(self.children) == 0  
+
+class CherryTreeNode(_CherryTreeNodeBase):
+    """
+    Class holding node data for a richtext node
+    """
+    syntax = 'custom-colors'
+    is_richtext = 1
+
+    def __init__(self, name, father_id=0, icon=0, is_ro=0, children=None, tags=None):
+        super().__init__(name, father_id, icon, is_ro, children, tags)
+
+        self.xml = ET.fromstring(self.get_base_xml())
+        self.images = []
+        self.codebox = []
+        self.tables = []
 
     @staticmethod
     def get_base_xml():
@@ -133,36 +180,7 @@ class CherryTreeNode:
         length = 0
         for text in self.xml.itertext():
             length += len(text)
-        return length
-
-    def append(self, child):
-        """Add a children to the list"""
-        self.children.append(child)
-
-    def get_all_children_recurse(self):
-        """
-        return the list of all children of the current node
-        recursively, and include the root node as the first element
-        """
-        all_children = [self]
-        for child in self.children:
-            all_children.extend(child.get_all_children_recurse())
-        return all_children
-
-    def __iter__(self):
-        """Iter through all child nodes"""
-        for node in self.get_all_children_recurse():
-            yield node
-
-    @property
-    def is_root_node(self):
-        """Check if a node is the root node"""
-        return self.father_id == 0
-
-    @property
-    def is_last_node(self):
-        """Check if a node is the last one"""
-        return len(self.children) == 0    
+        return length  
 
     @property
     def has_image(self):
@@ -187,8 +205,53 @@ class CherryTreeNode:
         """
         return 0 if len(self.tables) == 0 else 1
 
-    def get_xml(self):
-        """Return the xml containing in the node which is xml by default"""
+    def get_text(self):
+        """Return the xml contained in the node which is xml on richtext"""
         if self.xml is None:
             return self.get_base_xml()
         return ET.tostring(self.xml, encoding="UTF-8", xml_declaration=True)
+
+class _CherryTreeTextNode(_CherryTreeNodeBase):
+    """
+    Class representing a node that contains only text
+    """
+    is_richtext = 0
+    has_image = 0
+    has_codebox = 0
+    has_table = 0
+
+    def __init__(self, name, txt="", father_id=0, icon=0, is_ro=0, children=None, tags=None):
+        super().__init__(name, father_id, icon, is_ro, children, tags)
+
+        self.txt = txt
+
+    def get_text(self):
+        """
+        Get the text content
+        """
+        return self.txt
+
+    def add_text(self, txt):
+        """
+        Add text to the node
+        """
+        self.txt += txt
+
+class CherryTreeCodeNode(_CherryTreeTextNode):
+    """
+    Class holding node data for a code node
+    """
+    def __init__(self, name, syntax, txt="", father_id=0, icon=0, is_ro=0, children=None, tags=None):
+        super().__init__(name, txt, father_id, icon, is_ro, children, tags)
+
+        self.syntax = syntax
+
+class CherryTreePlainNode(_CherryTreeTextNode):
+    """
+    Class holding node data for a richtext node
+    """
+    syntax = "plain-text"
+
+    def __init__(self, name, txt="", father_id=0, icon=0, is_ro=0, children=None, tags=None):
+        super().__init__(name, txt, father_id, icon, is_ro, children, tags)
+

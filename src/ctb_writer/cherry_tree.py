@@ -2,7 +2,7 @@
 This class allows to create a new CherryTree and manipulate it
 """
 import xml.etree.ElementTree as ET
-from .cherry_tree_node import CherryTreeNode
+from .cherry_tree_node import CherryTreeNode, _CherryTreeNodeBase
 from .cherry_tree_link import CherryTreeLink
 from .icons import get_icon
 
@@ -61,7 +61,7 @@ class CherryTree:
         :type parent_id: int
 
         :param node: The node to add
-        :type node: class:`CherryTreeNode`
+        :type node: class:`_CherryTreeNodeBase`
         """
         new_node_id = self.get_new_id()
         if not new_node_id:
@@ -83,12 +83,12 @@ class CherryTree:
         :type parent_id: int
 
         :param node: The node created
-        :type node: class:`CherryTreeNode`
+        :type node: class:`_CherryTreeNodeBase`
 
         :return: The id of the node added
         """
         node_id = self.get_new_id()
-        if isinstance(node, CherryTreeNode):
+        if isinstance(node, _CherryTreeNodeBase):
             return self._add_child_node(node, parent_id)
 
         elif isinstance(node, str):

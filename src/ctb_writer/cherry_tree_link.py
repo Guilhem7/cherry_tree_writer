@@ -125,9 +125,9 @@ class CherryTreeLink:
                             """,
                             (node.node_id,
                              node.name,
-                             node.get_xml(),
-                             "custom-colors",
-                             None,
+                             node.get_text(),
+                             node.syntax,
+                             node.get_tags(),
                              _ColumnConvert.to_ro(node),
                              _ColumnConvert.to_richtext(node),
                              node.has_codebox,
@@ -265,7 +265,7 @@ class _ColumnConvert:
         add it as richtext
         """
         title_style = node.get_title_style()
-        is_richtext = 1
+        is_richtext = node.is_richtext
         is_bold = 1 if title_style.get('bold', False) else 0
         is_foreground = 1 if title_style.get('color', None) is not None else 0
         color_int = 0

@@ -3,15 +3,25 @@ Class that allow to build a node given the parameters wanted
 """
 from os.path import expanduser
 from .icons import get_icon
-from .cherry_tree_node import CherryTreeNode, CherryTreeImage
+from .cherry_tree_node import CherryTreeNode, CherryTreeCodeNode, CherryTreePlainNode
 import xml.etree.ElementTree as ET
 
 class CherryTreeNodeBuilder:
     """
     Builder for a cherry tree node
     """
-    def __init__(self, name, color=None, bold=False):
-        self.node = CherryTreeNode(name)
+    def __init__(self, name, type="rich", syntax=None, color=None, bold=False):
+        if type == "rich":
+            self.node = CherryTreeNode(name)
+        elif type == "plain":
+            self.node = CherryTreePlainNode(name)
+
+        elif type == "code":
+            if syntax == None:
+                raise ValueError(f"Code node cannot be initialized without a syntax")
+            self.node = CherryTreeCodeNode(name, syntax)
+        else:
+            raise ValueError(f"Unknow node type {type!r}, choose between: 'rich', 'plain' and 'code'")
 
         if bold:
             self.node.set_bold_title()
@@ -30,7 +40,10 @@ class CherryTreeNodeBuilder:
         """
         Add the Text to a node
         """
-        self.node.add_text(text, attrib=style)
+        if self.node.is_richtext:
+            self.node.add_text(text, attrib=style)
+        else:
+            self.node.add_text(text)
         return self
 
     def image(self, filename, position=-1, justification="left"):
