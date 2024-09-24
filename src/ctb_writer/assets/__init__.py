@@ -88,6 +88,21 @@ class CherryTreeTable(_CherryTreeTableDefault, _CherryTreeTableBase):
             xml.append(new_row)
         return ET.tostring(xml, encoding="UTF-8", xml_declaration=True)
 
+    @classmethod
+    def from_xml(cls, xml_string, position, **kwargs):
+        """
+        Build a cherry tree table from the xml
+        """
+        table_xml = ET.fromstring(xml_string)
+        content = []
+        for row_elem in table_xml.iter("row"):
+            row = []
+            for cell in row_elem.iter("cell"):
+                row.append(cell.text)
+
+            content.append(row)
+        return cls(content=content, position=position, **kwargs)
+
 ### Cherry Tree image
 @dataclass
 class _CherryTreeImageBase():

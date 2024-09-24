@@ -110,6 +110,7 @@ class CherryTreeLink:
                 has_table = row[_NodeRow.HAS_TABLE]
                 has_codebox = row[_NodeRow.HAS_CODEBOX]
                 node = CherryTreeNode(row[_NodeRow.NAME])
+                node.node_id = row[_NodeRow.NODE_ID]
                 if has_image:
                     self._recover_image(node)
                 if has_table:
@@ -119,11 +120,12 @@ class CherryTreeLink:
 
             elif syntax == 'plain-text':
                 node = CherryTreePlainNode(row[_NodeRow.NAME])
+                node.node_id = row[_NodeRow.NODE_ID]
 
             else:
                 node = CherryTreeCodeNode(row[_NodeRow.NAME], syntax=syntax)
+                node.node_id = row[_NodeRow.NODE_ID]
 
-            node.node_id = row[_NodeRow.NODE_ID]
             node.set_text(row[_NodeRow.TXT])
 
             _ColumnConvert.from_ro(node, row[_NodeRow.IS_RO])
@@ -167,11 +169,16 @@ class CherryTreeLink:
         """
         Recover the tables for a given node
         """
-        rows = self.cursor.execute("""SELECT node_id, offset, justification, txt
+        rows = self.cursor.execute("""SELECT node_id, offset, justification, txt,
                                              col_min, col_max
                                       FROM grid WHERE node_id=?""", (node.node_id, ))
         for row in rows.fetchall():
-            pass
+            table_to_add = CherryTreeTable.from_xml(row[_TableRow.TXT],
+                                                    position=row[_TableRow.OFFSET],
+                                                    justification=row[_TableRow.JUSTIFICATION],
+                                                    col_min=row[_TableRow.COL_MIN],
+                                                    col_max=row[_TableRow.COL_MAX])
+            node.tables.append(table_to_add)
 
     def save(self, nodes):
         """
