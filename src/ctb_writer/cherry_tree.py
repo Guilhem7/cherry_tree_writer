@@ -46,7 +46,7 @@ class CherryTree:
         nodes = []
         for node in self._get_all_nodes():
             if node.name == node_name:
-                nodes.append(nodes)
+                nodes.append(node)
         return nodes
 
     def _get_all_nodes_recurse(self, nodes):
