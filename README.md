@@ -51,9 +51,10 @@ ctb_document.save("my_notes.ctb")
 
 Load an existing document
 ```python
-from ctb_writer import CherryTree, CherryTreeNodeBuilder
+from ctb_writer import CherryTree
 
 ctb_document = CherryTree.load("my_notes.ctb")
+# Use ctb_document
 ```
 
 ## Installation
