@@ -138,10 +138,10 @@ class CherryTree:
 
         ctb_document = cls()
         ctb_document.ctb_sql_link = CherryTreeLink(sqlite_ctb)
-        ctb_document.get_nodes_from_db()
+        ctb_document._get_nodes_from_db()
         return ctb_document
 
-    def get_nodes_from_db(self):
+    def _get_nodes_from_db(self):
         """
         Recover all the nodes from the db
         """
