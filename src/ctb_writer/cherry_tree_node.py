@@ -77,7 +77,11 @@ class _CherryTreeNodeBase:
     @property
     def is_last_node(self):
         """Check if a node is the last one"""
-        return len(self.children) == 0  
+        return len(self.children) == 0
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(node_id={self.node_id},name=\"{self.name}\",icon={self.icon}" +\
+               f",father_id={self.father_id},children={len(self.children)})"
 
 class CherryTreeNode(_CherryTreeNodeBase):
     """
@@ -97,14 +101,6 @@ class CherryTreeNode(_CherryTreeNodeBase):
     @staticmethod
     def get_base_xml():
         return '<?xml version="1.0" encoding="UTF-8"?>\n<node/>'
-
-    def __str__(self):
-        return f"CherryTreeNode(node_id={self.node_id},name=\"{self.name}\",icon={self.icon}" +\
-               f",father_id={self.father_id},children={len(self.children)})"
-
-    def __repr__(self):
-        return f"CherryTreeNode(node_id={self.node_id},name=\"{self.name}\",icon={self.icon}" +\
-               f",father_id={self.father_id},children={len(self.children)})"
 
     def extend(self, children):
         """Add a list of children to the current Node"""
@@ -211,6 +207,12 @@ class CherryTreeNode(_CherryTreeNodeBase):
             return self.get_base_xml()
         return ET.tostring(self.xml, encoding="UTF-8", xml_declaration=True)
 
+    def set_text(self, text):
+        """
+        Set the text of the node as XML
+        """
+        self.xml = ET.fromstring(text)
+
 class _CherryTreeTextNode(_CherryTreeNodeBase):
     """
     Class representing a node that contains only text
@@ -236,6 +238,12 @@ class _CherryTreeTextNode(_CherryTreeNodeBase):
         Add text to the node
         """
         self.txt += txt
+
+    def set_text(self, text):
+        """
+        Set the text of the node to text
+        """
+        self.txt = text
 
 class CherryTreeCodeNode(_CherryTreeTextNode):
     """

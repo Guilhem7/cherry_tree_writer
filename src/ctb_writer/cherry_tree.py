@@ -1,6 +1,7 @@
 """
 This class allows to create a new CherryTree and manipulate it
 """
+import os
 import xml.etree.ElementTree as ET
 from .cherry_tree_node import CherryTreeNode, _CherryTreeNodeBase
 from .cherry_tree_link import CherryTreeLink
@@ -12,7 +13,7 @@ class CherryTree:
     """
     def __init__(self):
         self.nodes = []
-        self.last_id = 0
+        self.ctb_sql_link = None
 
     def __str__(self):
         return f"<{self.__class__.__name__}: {len(self.nodes)} children>"
@@ -20,11 +21,33 @@ class CherryTree:
     def get_node_by_id(self, node_id):
         """
         Recover a node by its id
+
+        :param node_id: The id of the node to recover
+        :type node_id: int
+
+        :return: The node with the specified id if it exists
+        :rtype: class:`_CherryTreeNodeBase`
         """
         for node in self._get_all_nodes():
             if node.node_id == node_id:
                 return node
         return None
+
+    def get_node_by_name(self, node_name):
+        """
+        Recover a node by its id
+
+        :param node_name: The name of the node to recover
+        :type node_name: str
+
+        :return: The list of the node having this name
+        :rtype: List[class:`_CherryTreeNodeBase`]
+        """
+        nodes = []
+        for node in self._get_all_nodes():
+            if node.name == node_name:
+                nodes.append(nodes)
+        return nodes
 
     def _get_all_nodes_recurse(self, nodes):
         """
@@ -101,6 +124,28 @@ class CherryTree:
             return self._add_child_node(new_node, parent_id)
 
         raise ValueError(f"Cannot insert node with type {type(node)}")
+
+    @classmethod
+    def load(cls, sqlite_ctb):
+        """
+        Load the Document from an existing database
+
+        :param sqlite_ctb: The existing cherry tree to use
+        :type sqlite_ctb: str
+        """
+        if not os.path.exists(sqlite_ctb):
+            raise FileNotFoundError(f"Cannot find file {sqlite_ctb}")
+
+        ctb_document = cls()
+        ctb_document.ctb_sql_link = CherryTreeLink(sqlite_ctb)
+        ctb_document.get_nodes_from_db()
+        return ctb_document
+
+    def get_nodes_from_db(self):
+        """
+        Recover all the nodes from the db
+        """
+        self.nodes = self.ctb_sql_link.get_nodes()
 
     def save(self, name):
         """

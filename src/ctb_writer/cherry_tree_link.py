@@ -4,6 +4,9 @@ Link cherry tree instance to the database
 import sqlite3
 import os
 from time import time
+from .cherry_tree_rows import _NodeRow, _ImageRow, _CodeboxRow, _TableRow
+from .cherry_tree_node import CherryTreeNode, CherryTreeCodeNode, CherryTreePlainNode
+from ctb_writer.assets import *
 
 class CherryTreeLink:
     """
@@ -16,8 +19,6 @@ class CherryTreeLink:
     """
     def __init__(self, name):
         self.name = name
-        if os.path.exists(self.name):
-            raise ValueError(f"File {self.name} already exists, aborting") from None
         self.con = sqlite3.connect(self.name)
         self.cursor = self.con.cursor()
 
@@ -40,9 +41,137 @@ class CherryTreeLink:
 
         elif ext != ".ctb":
             raise ValueError(f"Extension {val} is not supported "
-                             "for creating a cherry tree document")
+                             "for cherry tree document")
         else:
             self._name = val
+
+    def get_nodes(self):
+        """
+        Recover nodes from the database
+        """
+        root_nodes = self.recover_root_nodes()
+        for root_node in root_nodes:
+            self._recover_nodes_recurse(root_node)
+        return root_nodes
+
+    def recover_root_nodes(self):
+        """
+        Recover the root nodes of the document
+        """
+        root_nodes = []
+        rows = self.cursor.execute("""SELECT node_id, father_id, sequence
+                                      FROM children
+                                      WHERE father_id=0
+                                      ORDER BY sequence ASC""")
+
+        for row in rows.fetchall():
+            root_nodes.append(self.recover_node(row[0]))
+        return root_nodes
+
+    def _recover_nodes_recurse(self, father):
+        """
+        Recover all the nodes recursively
+
+        :param father: The father node
+        :type father: class:`_CherryTreeNodeBase`
+        """
+        rows = self.cursor.execute("""SELECT node_id, father_id, sequence
+                                      FROM children
+                                      WHERE father_id=?
+                                      ORDER BY sequence ASC""", (father.node_id,))
+
+        for children in rows.fetchall():
+            child = self.recover_node(children[0])
+            child.father_id = father.node_id
+            self._recover_nodes_recurse(child)
+            father.append(child)
+
+    def recover_node(self, node_id):
+        """
+        Recover a node from the table node
+
+        :param node_id: The id of the node to recover
+        :type node_id: int
+        """
+        rows = self.cursor.execute("""SELECT node_id, name, txt, syntax,
+                                             tags, is_ro, is_richtxt, has_codebox,
+                                             has_table, has_image
+                                      FROM node WHERE node_id=?""", (node_id,))
+        row = rows.fetchone()
+        if row:
+            is_richtext = row[_NodeRow.IS_RICHTEXT] & 0x1
+            syntax = row[_NodeRow.SYNTAX]
+            tags = None
+            if row[_NodeRow.TAGS]:
+                tags = row[_NodeRow.TAGS].split(" ")
+
+            if is_richtext:
+                has_image = row[_NodeRow.HAS_IMAGE]
+                has_table = row[_NodeRow.HAS_TABLE]
+                has_codebox = row[_NodeRow.HAS_CODEBOX]
+                node = CherryTreeNode(row[_NodeRow.NAME])
+                if has_image:
+                    self._recover_image(node)
+                if has_table:
+                    self._recover_table(node)
+                if has_codebox:
+                    self._recover_codebox(node)
+
+            elif syntax == 'plain-text':
+                node = CherryTreePlainNode(row[_NodeRow.NAME])
+
+            else:
+                node = CherryTreeCodeNode(row[_NodeRow.NAME], syntax=syntax)
+
+            node.node_id = row[_NodeRow.NODE_ID]
+            node.set_text(row[_NodeRow.TXT])
+
+            _ColumnConvert.from_ro(node, row[_NodeRow.IS_RO])
+            _ColumnConvert.from_richtext(node, row[_NodeRow.IS_RICHTEXT])
+
+            return node
+        raise ValueError(f"Node {node_id} not found in database")
+
+    def _recover_codebox(self, node):
+        """
+        Recover codebox for a given node
+        """
+        rows = self.cursor.execute("""SELECT node_id, offset, justification, txt, syntax,
+                                             width, height, is_width_pix, do_highl_bra, do_show_linenum
+                                      FROM codebox WHERE node_id=?""", (node.node_id, ))
+        for row in rows.fetchall():
+            codebox_db = CherryTreeCodebox(txt=row[_CodeboxRow.TXT],
+                                        syntax=row[_CodeboxRow.SYNTAX],
+                                        position=row[_CodeboxRow.OFFSET],
+                                        justification=row[_CodeboxRow.JUSTIFICATION],
+                                        width=row[_CodeboxRow.WIDTH],
+                                        height=row[_CodeboxRow.HEIGHT],
+                                        is_width_pix=row[_CodeboxRow.IS_WIDTH_PIX],
+                                        highlight_brackets=row[_CodeboxRow.HIGHLIGHT_BRACKETS],
+                                        show_line_numbers=row[_CodeboxRow.SHOW_LINE_NUMBERS])
+            node.codebox.append(codebox_db)
+
+    def _recover_image(self, node):
+        """
+        Recover image for a given node
+        """
+        rows = self.cursor.execute("""SELECT node_id, offset, justification, anchor, png
+                                      FROM image WHERE node_id=?""", (node.node_id, ))
+        for row in rows.fetchall():
+            image = CherryTreeImage(position=row[_ImageRow.OFFSET],
+                                    data=row[_ImageRow.PNG],
+                                    justification=row[_ImageRow.JUSTIFICATION])
+            node.images.append(image)
+
+    def _recover_table(self, node):
+        """
+        Recover the tables for a given node
+        """
+        rows = self.cursor.execute("""SELECT node_id, offset, justification, txt
+                                             col_min, col_max
+                                      FROM grid WHERE node_id=?""", (node.node_id, ))
+        for row in rows.fetchall():
+            pass
 
     def save(self, nodes):
         """
@@ -250,12 +379,33 @@ class _ColumnConvert:
     This class allows to convert some column to the format expected
     """
     @staticmethod
+    def from_ro(node, is_ro):
+        """
+        Set the values icon and is_ro from is_ro
+        """
+        node.is_ro = is_ro & 0x1
+        node.icon = is_ro >> 1
+
+    @staticmethod
+    def from_richtext(node, is_richtext):
+        """
+        Set the values of the node from is_richtext
+        """
+        if (is_richtext >> 1) & 0x1:
+            node.set_bold_title()
+
+        if (is_richtext >> 2) & 0x1:
+            color = hex((is_richtext >> 3) & 0xffffff)[2:]
+            color = color.zfill(6)
+            node.set_title_color(f"#{color}")
+
+    @staticmethod
     def to_ro(node):
         """
         Extract the information from the node to
         add it as ro
         """
-        return node.icon | node.is_ro
+        return node.icon << 1 | node.is_ro
 
     @staticmethod
     def to_richtext(node):

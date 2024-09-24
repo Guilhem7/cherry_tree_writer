@@ -49,6 +49,13 @@ ctb_document.add_child(python_code, parent_id=root_id)
 ctb_document.save("my_notes.ctb")
 ```
 
+Load an existing document
+```python
+from ctb_writer import CherryTree, CherryTreeNodeBuilder
+
+ctb_document = CherryTree.load("my_notes.ctb")
+```
+
 ## Installation
 ```bash
 git clone https://github.com/Guilhem7/cherry_tree_writer.git
