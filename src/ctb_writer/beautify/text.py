@@ -1,8 +1,9 @@
 """
 This file allows to add beautify text to cherrytree
 """
-import xml.etree.ElementTree as ET
 import re
+import warnings
+import xml.etree.ElementTree as ET
 from ctb_writer.styles import styles
 
 
@@ -55,9 +56,11 @@ class CherryTreeRichtext:
      - Colors
      - Other style
     """
-    def __init__(self, text, bold=False, fg=None, bg=None):
+    def __init__(self, text, bold=False, underline=False, size=None, fg=None, bg=None):
         self.text = text
         self.bold = bold
+        self.underline = underline
+        self.size = size
         self.fg = fg
         self.bg = bg
 
@@ -104,6 +107,15 @@ class CherryTreeRichtext:
         if self.bg:
             text_attributes["background"] = self.bg
 
+        if self.underline:
+            text_attributes["underline"] = "single"
+
+        if self.size:
+            if not re.match(r"h[1-3]", self.size, re.I):
+                warnings.warn(f"Unknown size: {self.size}, use h1-3")
+            else:
+                text_attributes["scale"] = self.size.lower()
+
         richtext = ET.Element("rich_text", attrib=text_attributes)
         richtext.text = self.text
         return richtext
@@ -121,5 +133,7 @@ class CherryTreeRichtext:
         """
         return cls(text,
                    bold=attributes.get("bold", False),
+                   underline=attributes.get("underline", False),
+                   size=attributes.get("size"),
                    fg=attributes.get("fg"),
                    bg=attributes.get("bg"))
