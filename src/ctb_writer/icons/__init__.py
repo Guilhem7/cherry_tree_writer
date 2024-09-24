@@ -19,7 +19,7 @@ def get_icon(icon_name):
 	else:
 		if not icon_name.startswith(prefix_icon):
 			icon_name = prefix_icon + icon_name
-		value = icons.get(icon_name.lower())
+		value = icons.get(icon_name)
 		if not value:
 			warnings.warn(f"Icon {icon_name} not found, refers to:\n"
 						  "python3 -m ctb_writer.icons",
