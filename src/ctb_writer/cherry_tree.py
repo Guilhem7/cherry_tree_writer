@@ -150,7 +150,11 @@ class CherryTree:
     def save(self, name):
         """
         Save the nodes to a cherrytree file
+
+        :raise ValueError: If the file to save already exists
         """
+        if os.path.exists(name):
+            raise ValueError(f"File {name} already exists, cannot overwrite !")
         self.ctb_sql_link = CherryTreeLink(name)
         self.ctb_sql_link.init()
         self.ctb_sql_link.save(self.nodes)
