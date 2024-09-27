@@ -97,3 +97,4 @@ python3 -m ctb_writer.styles
 4. :white_check_mark: Add alias for color
 5. :white_check_mark: Parse an existing Cherry tree document
 6. Allows to save with password
+7. Add an easiest way to prettify text
