@@ -46,6 +46,16 @@ class CherryTreeNodeBuilder:
             self.node.add_text(text)
         return self
 
+    def texts(self, texts):
+        """
+        Add multiple texts to a node
+        """
+        if self.node.is_richtext:
+            self.node.add_texts(texts)
+        else:
+            raise ValueError("Cannot add multiple texts to a node which is not richtext")
+        return self
+
     def image(self, filename, position=-1, justification="left"):
         """
         Insert an image in the node, at the given position, default position is

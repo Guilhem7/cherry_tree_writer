@@ -9,41 +9,38 @@ from ctb_writer.styles import styles
 
 COLOR_RE = re.compile(r"#[0-9a-f]{6}", re.I)
 
+def get_color(color):
+    """
+    Return a color from input hex or name
+
+    :raises ValueError: If the color is not valid
+    """
+    if isinstance(color, bytes):
+        color = color.decode()
+
+    resolved_color = styles.get(color.lower())
+    if resolved_color:
+        return resolved_color
+
+    if not re.match(COLOR_RE, color):
+        raise ValueError("A color with the format '#af45df' is expected") from None
+
+    return color
+
 def color(func):
     """
     Check that args given is a color
     """
-    def check_color(color):
-        if re.match(COLOR_RE, color):
-            return True
-        raise ValueError("A color with the format '#af45df' is expected") from None
-
     def wrapper_is_color(*args, **kwargs):
         new_args = []
         for i, arg in enumerate(args):
-            if isinstance(arg, bytes):
-                arg = arg.decode()
-
-            if isinstance(arg, str):
-                resolved_color = styles.get(arg.lower())
-                if resolved_color:
-                    arg = resolved_color
-                else:
-                    check_color(arg)
-
+            if isinstance(arg, str) or isinstance(arg, bytes):
+                arg = get_color(arg)
             new_args.append(arg)
 
-
         for key, arg in kwargs.items():
-            if isinstance(arg, bytes):
-                arg = arg.decode()
-
-            if isinstance(arg, str):
-                resolved_color = styles.get(arg.lower())
-                if resolved_color:
-                    kwargs[i] = resolved_color
-                else:
-                    check_color(arg)
+            if isinstance(arg, str) or isinstance(arg, bytes):
+                kwargs[key] = get_color(arg)
 
         return func(*new_args, **kwargs)
     return wrapper_is_color
@@ -119,6 +116,28 @@ class CherryTreeRichtext:
         richtext = ET.Element("rich_text", attrib=text_attributes)
         richtext.text = self.text
         return richtext
+
+    @classmethod
+    def from_style(cls, text, style):
+        """
+        Parse a style and return the text
+        """
+        attrib = {}
+        for text_style in style.split("|"):
+            if text_style == "bold":
+                attrib["bold"] = True
+
+            elif text_style == "underline":
+                attrib["underline"] = True
+
+            elif ":" in text_style:
+                style_name, style_val = text_style.split(":")
+                if style_name == "fg" or style_name == "bg":
+                    attrib[style_name] = get_color(style_val)
+                else:
+                    attrib[style_name] = style_val
+
+        return cls.from_attributes(text, attrib)
 
     @classmethod
     def from_attributes(cls, text, attributes):

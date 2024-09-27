@@ -118,6 +118,22 @@ class CherryTreeNode(_CherryTreeNodeBase):
         richtext = CherryTreeRichtext.from_attributes(text, attrib).get_xml()
         self.xml.append(richtext)
 
+    def add_texts(self, texts):
+        """
+        Add multiple texts
+
+        :param texts: The texts and style to add
+        :type texts: List[Tuple[str, str]]
+        """
+        for style, text in texts:
+            richtext = CherryTreeRichtext.from_style(text, style).get_xml()
+            self.xml.append(richtext)
+
+    def replace(self, replace, replacement, style={}):
+        """
+        Replace a text, and can also change its style
+        """
+
     def add_image(self, image_name, position=-1, justification="left"):
         """
         Add an image to the text
