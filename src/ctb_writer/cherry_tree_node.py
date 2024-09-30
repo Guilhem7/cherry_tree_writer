@@ -1,6 +1,7 @@
 """
 Class representing a cherry tree node
 """
+from copy import copy
 from os.path import expanduser
 from dataclasses import dataclass
 from .beautify import CherryTreeRichtext, color
@@ -133,6 +134,28 @@ class CherryTreeNode(_CherryTreeNodeBase):
         """
         Replace a text, and can also change its style
         """
+        for i in reversed(range(len(self.xml))):
+            element = self.xml[i]
+            if replace in element.text:
+                new_elements = []
+                parts = element.text.split(replace)
+
+                for index, text_part in enumerate(parts):
+                    new_style = style
+                    if not new_style:
+                        new_style = element.attrib
+                    side_element_custom = CherryTreeRichtext.from_attributes(replacement, new_style).get_xml()
+
+                    if text_part != "":
+                        side_element = copy(element)
+                        side_element.text = text_part
+                        new_elements.append(side_element)
+                    if index < len(parts)-1:
+                        new_elements.append(side_element_custom)
+
+                for new_element in reversed(new_elements):
+                    self.xml.insert(i, new_element)
+                self.xml.remove(element)
 
     def add_image(self, image_name, position=-1, justification="left"):
         """
