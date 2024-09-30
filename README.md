@@ -54,7 +54,9 @@ Load an existing document
 from ctb_writer import CherryTree
 
 ctb_document = CherryTree.load("my_notes.ctb")
-# Use ctb_document
+# Change a text in a node
+node_id = ctb_document.get_node_by_id(3)
+node_id.replace("Content", "CONTENT", {"bold": True}) # Set a part of the text node to bold
 ```
 
 ## Installation
