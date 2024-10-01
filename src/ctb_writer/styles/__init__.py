@@ -138,6 +138,7 @@ styles = {
   "snow": "#fffafa",
   "springgreen": "#00ff7f",
   "steelblue": "#4682b4",
+  "sun": "#f5c211",
   "tan": "#d2b48c",
   "teal": "#008080",
   "thistle": "#d8bfd8",
