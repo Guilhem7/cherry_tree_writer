@@ -134,7 +134,7 @@ styles = {
   "seashell": "#fff5ee",
   "sienna": "#a0522d",
   "silver": "#c0c0c0",
-  "skyblue": "#87ceeb",
+  "seablue": "#1C71D8",
   "slateblue": "#6a5acd",
   "slategray": "#708090",
   "slategrey": "#708090",
