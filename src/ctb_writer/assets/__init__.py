@@ -98,7 +98,10 @@ class CherryTreeTable(_CherryTreeTableDefault, _CherryTreeTableBase):
         for row_elem in table_xml.iter("row"):
             row = []
             for cell in row_elem.iter("cell"):
-                row.append(cell.text)
+                if cell.text is not None:
+                    row.append(cell.text)
+                else:
+                    row.append("")
 
             content.append(row)
         return cls(content=content, position=position, **kwargs)
