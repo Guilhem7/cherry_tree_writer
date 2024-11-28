@@ -62,7 +62,6 @@ node.replace("Content", "CONTENT", {"bold": True}) # Set a part of the text node
 ## Add other items and text beautified
 ```python
 from ctb_writer import CherryTree, CherryTreeNodeBuilder as NodeBuilder
-from ctb_writer.beautify import parse # Allow to parse text
 
 ctb_document = CherryTree() # Init the cherry tree document
 root_id = ctb_document.add_child("Root node") # Add a node with a name
