@@ -3,6 +3,7 @@ Class that allow to build a node given the parameters wanted
 """
 from os.path import expanduser
 from .icons import get_icon
+from .beautify import parse
 from .cherry_tree_node import CherryTreeNode, CherryTreeCodeNode, CherryTreePlainNode
 import xml.etree.ElementTree as ET
 
@@ -49,8 +50,11 @@ class CherryTreeNodeBuilder:
     def texts(self, texts):
         """
         Add multiple texts to a node
+        If texts is a string, it will be automatically parsed
         """
         if self.node.is_richtext:
+            if isinstance(texts, str):
+                texts = parse(texts)
             self.node.add_texts(texts)
         else:
             raise ValueError("Cannot add multiple texts to a node which is not richtext")

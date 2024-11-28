@@ -79,14 +79,17 @@ other_node = CherryTreeNodeBuilder("New node", bold=True, color='darkorange').ic
                                    .get_node()
 
 # Add text that will be formatted
-text_content = """\
+text_content = """
 [(bold|underline)]Title:[/]
  - [(fg:orange)]orange[/]
  - [(bg:sun)]yellow background[/]
  - [(fg:blue|underline)]blue underlined[/]
+
+[(bg:sun|fg:orange)]##############################################################################################[/]
+
 """
 
-text_colored_node = CherryTreeNodeBuilder("Colored node").texts(parse(text_content)).get_node()
+text_colored_node = CherryTreeNodeBuilder("Colored node").texts(text_content).get_node()
 
 ctb_document.add_child(other_node, parent_id=root_id)
 ctb_document.save("my_notes.ctb")
