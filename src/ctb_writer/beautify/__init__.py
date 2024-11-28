@@ -1,1 +1,1 @@
-from .text import CherryTreeRichtext, color
+from .text import CherryTreeRichtext, color, parse

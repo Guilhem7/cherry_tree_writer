@@ -59,6 +59,39 @@ node = ctb_document.get_node_by_id(3)
 node.replace("Content", "CONTENT", {"bold": True}) # Set a part of the text node to bold
 ```
 
+## Add other items and text beautified
+```python
+from ctb_writer import CherryTree, CherryTreeNodeBuilder as NodeBuilder
+from ctb_writer.beautify import parse # Allow to parse text
+
+ctb_document = CherryTree() # Init the cherry tree document
+root_id = ctb_document.add_child("Root node") # Add a node with a name
+
+# Tables in cherry tree contain HEADER at the END of a table
+table = [["Content1", "C2"], ["Content2", "C3"], ["Col1", "Col2"]]
+
+# Add codebox, local images or table
+other_node = CherryTreeNodeBuilder("New node", bold=True, color='darkorange').icon("python")\
+                                   .text("tests\n", style={"underline": True, "size":"h1"})\
+                                   .codebox("import os\nprint('test')\n", syntax='python')\
+                                   .image("images/ghost.png", justification="center")\
+                                   .table(content=table)\
+                                   .get_node()
+
+# Add text that will be formatted
+text_content = """\
+[(bold|underline)]Title:[/]
+ - [(fg:orange)]orange[/]
+ - [(bg:sun)]yellow background[/]
+ - [(fg:blue|underline)]blue underlined[/]
+"""
+
+text_colored_node = CherryTreeNodeBuilder("Colored node").texts(parse(text_content)).get_node()
+
+ctb_document.add_child(other_node, parent_id=root_id)
+ctb_document.save("my_notes.ctb")
+```
+
 ## Installation
 ```bash
 git clone https://github.com/Guilhem7/cherry_tree_writer.git
@@ -99,4 +132,4 @@ python3 -m ctb_writer.styles
 4. :white_check_mark: Add alias for color
 5. :white_check_mark: Parse an existing Cherry tree document
 6. Allows to save with password
-7. Add an easiest way to prettify text
+7. :white_check_mark: Add an easiest way to prettify text

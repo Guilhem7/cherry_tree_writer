@@ -5,7 +5,7 @@ import re
 import warnings
 import xml.etree.ElementTree as ET
 from ctb_writer.styles import styles
-
+from .text_parser import Tokenizer
 
 COLOR_RE = re.compile(r"#[0-9a-f]{6}", re.I)
 
@@ -45,6 +45,41 @@ def color(func):
         return func(*new_args, **kwargs)
     return wrapper_is_color
 
+
+def parse(text):
+    """
+    Parse a given text and return a list of usable tuples
+    """
+    result = []
+    tokens = Tokenizer.tokenize(text)
+
+    escaped = []
+    style_in_use = ""
+    current_position = 0
+    for token in tokens:
+        if token.type == "ESCAPE":
+            escaped.append(token)
+
+        elif token.type == "START":
+            result.append((style_in_use, text[current_position:token.column]))
+            style_in_use = token.value[2:-2]
+            current_position = token.column + len(token.value)
+
+        elif token.type == "END":
+            text_to_add = ""
+            while escaped:
+                token_to_escape = escaped.pop(0)
+                text_to_add += text[current_position: token_to_escape.column] + token_to_escape.value[1:-1]
+                current_position += len(token_to_escape.value)
+
+            text_to_add += text[current_position:token.column]
+
+            result.append((style_in_use, text_to_add))
+            style_in_use = ""
+            current_position = token.column + len(token.value)
+    if current_position < len(text):
+        result.append((style_in_use, text[current_position:]))
+    return result
 
 class CherryTreeRichtext:
     """

@@ -106,7 +106,7 @@ class CherryTreeNode(_CherryTreeNodeBase):
     def extend(self, children):
         """Add a list of children to the current Node"""
         if not isinstance(children, list):
-            raise ValueError("add_children method expect a list as parameter")
+            raise ValueError("extend method expect a list as parameter")
         self.children.extend(children)
 
     def add_text(self, text, attrib={}):
@@ -125,6 +125,9 @@ class CherryTreeNode(_CherryTreeNodeBase):
 
         :param texts: The texts and style to add
         :type texts: List[Tuple[str, str]]
+
+        example:
+            [("bold|underline", "test")]            
         """
         for style, text in texts:
             richtext = CherryTreeRichtext.from_style(text, style).get_xml()
