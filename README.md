@@ -1,5 +1,5 @@
 # Cherrytree Writer
-Simple library to write a **Cherrytree** document
+Simple library to **Create**, **Read** or **Update** a **Cherrytree** document
 
 ## Usage
 ```python
