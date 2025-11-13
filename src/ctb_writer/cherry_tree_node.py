@@ -247,7 +247,7 @@ class CherryTreeNode(_CherryTreeNodeBase):
         """Return the xml contained in the node which is xml on richtext"""
         if self.xml is None:
             return self.get_base_xml()
-        return ET.tostring(self.xml, encoding="UTF-8", xml_declaration=True)
+        return ET.tostring(self.xml, encoding="UTF-8", xml_declaration=True).decode("UTF-8")
 
     def set_text(self, text):
         """

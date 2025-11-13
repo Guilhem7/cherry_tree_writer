@@ -37,6 +37,12 @@ class CherryTreeNodeBuilder:
         self.node.icon = get_icon(name)
         return self
 
+    def eol(self):
+        """
+        Add Line feed at the end
+        """
+        return self.text("\n")
+
     def text(self, text, style={}):
         """
         Add the Text to a node
