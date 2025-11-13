@@ -43,12 +43,13 @@ class Tokenizer:
 
 
 if __name__ == "__main__":
-    test = """
-    Test [(bold,underline)]bold_text[/]
+    test = """[(bold|underline)]bold_underlined_text[/]
 
     what is [[(nothing)]]
 
-    Am i [(undeline)]Underlined[/]
+    Am i [(underline)]Underlined[/]
+
+    [[(Test)]][(italic)]Italic[/]
     END !
     """
 

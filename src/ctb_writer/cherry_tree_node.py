@@ -266,7 +266,6 @@ class _CherryTreeTextNode(_CherryTreeNodeBase):
 
     def __init__(self, name, txt="", father_id=0, icon=0, is_ro=0, children=None, tags=None):
         super().__init__(name, father_id, icon, is_ro, children, tags)
-
         self.txt = txt
 
     def get_text(self):
@@ -293,7 +292,6 @@ class CherryTreeCodeNode(_CherryTreeTextNode):
     """
     def __init__(self, name, syntax, txt="", father_id=0, icon=0, is_ro=0, children=None, tags=None):
         super().__init__(name, txt, father_id, icon, is_ro, children, tags)
-
         self.syntax = syntax
 
 class CherryTreePlainNode(_CherryTreeTextNode):

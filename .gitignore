@@ -4,6 +4,7 @@ __pycache__/
 images/
 tests/
 test.py
+venv/
 
 *egg-info/
 build/

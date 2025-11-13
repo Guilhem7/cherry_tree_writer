@@ -9,6 +9,8 @@ what is [[(nothing)]]
 [(underline)]test[[(nope)]][/]
 
 Am i [(underline)]Underlined[/]
+
+[(italic)]Italic[/]
 END !
 """
 

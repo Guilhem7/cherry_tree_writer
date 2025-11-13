@@ -50,35 +50,39 @@ def parse(text):
     """
     Parse a given text and return a list of usable tuples
     """
-    result = []
     tokens = Tokenizer.tokenize(text)
-
-    escaped = []
-    style_in_use = ""
+    result = []
+    current_style = ""
     current_position = 0
-    for token in tokens:
-        if token.type == "ESCAPE":
-            escaped.append(token)
 
-        elif token.type == "START":
-            result.append((style_in_use, text[current_position:token.column]))
-            style_in_use = token.value[2:-2]
+    for token in tokens:
+        # append plain text before this token if non-empty
+        if token.column > current_position:
+            piece = text[current_position:token.column]
+            if piece:
+                result.append((current_style, piece))
+
+        if token.type == "START":
+            current_style = token.value[2:-2].strip()
             current_position = token.column + len(token.value)
 
         elif token.type == "END":
-            text_to_add = ""
-            while escaped:
-                token_to_escape = escaped.pop(0)
-                text_to_add += text[current_position: token_to_escape.column] + token_to_escape.value[1:-1]
-                current_position += len(token_to_escape.value)
-
-            text_to_add += text[current_position:token.column]
-
-            result.append((style_in_use, text_to_add))
-            style_in_use = ""
+            current_style = ""
             current_position = token.column + len(token.value)
+
+        elif token.type == "ESCAPE":
+            # treat escape as literal text; '[[(X)]]' -> '[(X)]'
+            unescaped = token.value[1:-1]
+            if unescaped:
+                result.append((current_style, unescaped))
+            current_position = token.column + len(token.value)
+
+    # trailing text
     if current_position < len(text):
-        result.append((style_in_use, text[current_position:]))
+        tail = text[current_position:]
+        if tail:
+            result.append((current_style, tail))
+
     return result
 
 class CherryTreeRichtext:
@@ -88,10 +92,11 @@ class CherryTreeRichtext:
      - Colors
      - Other style
     """
-    def __init__(self, text, bold=False, underline=False, size=None, fg=None, bg=None):
+    def __init__(self, text, bold=False, underline=False, italic=None, size=None, fg=None, bg=None):
         self.text = text
         self.bold = bold
         self.underline = underline
+        self.italic = italic
         self.size = size
         self.fg = fg
         self.bg = bg
@@ -142,9 +147,12 @@ class CherryTreeRichtext:
         if self.underline:
             text_attributes["underline"] = "single"
 
+        if self.italic:
+            text_attributes["style"] = "italic"
+
         if self.size:
-            if not re.match(r"h[1-3]", self.size, re.I):
-                warnings.warn(f"Unknown size: {self.size}, use h1-3")
+            if not re.match(r"^(h[1-6]|small)$", self.size, re.I):
+                warnings.warn(f"Unknown size: {self.size}, use h1-6 or small")
             else:
                 text_attributes["scale"] = self.size.lower()
 
@@ -164,6 +172,9 @@ class CherryTreeRichtext:
 
             elif text_style == "underline":
                 attrib["underline"] = True
+
+            elif text_style == "italic":
+                attrib["italic"] = True
 
             elif ":" in text_style:
                 style_name, style_val = text_style.split(":")
@@ -188,6 +199,7 @@ class CherryTreeRichtext:
         return cls(text,
                    bold=attributes.get("bold", False),
                    underline=attributes.get("underline", False),
+                   italic=attributes.get("italic", False),
                    size=attributes.get("size"),
                    fg=attributes.get("fg"),
                    bg=attributes.get("bg"))
