@@ -103,6 +103,15 @@ class CherryTreeNode(_CherryTreeNodeBase):
     def get_base_xml():
         return '<?xml version="1.0" encoding="UTF-8"?>\n<node/>'
 
+    @property
+    def entities(self):
+        """
+        Return the positionable entities (table, codebox and images)
+        ordered by position
+        """
+        return sorted(self.images + self.codebox + self.tables,
+                      key=lambda elt: elt.position)
+
     def extend(self, children):
         """Add a list of children to the current Node"""
         if not isinstance(children, list):

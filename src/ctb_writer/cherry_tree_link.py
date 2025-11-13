@@ -14,7 +14,6 @@ class CherryTreeLink:
     ./src/ct/ct_storage_sqlite.cc --> Some implementations of the columns
 
     TODO:
-     - Create a parser that can load existing ctb Database
      - Use INSERT or REPLACE and CREATE TABLE IF NOT EXISTS
     """
     def __init__(self, name):

@@ -35,3 +35,10 @@ def test_create_complex_cherry_tree():
 
     codenode = CherryTreeNodeBuilder("Code node", type="code", syntax="python").icon("python").text(CODEBOX).eol().get_node()
     document.add_child(codenode, parent_id=root_id)
+
+def test_entities_order():
+    node = CherryTreeNodeBuilder("Rich node").table([["Test"]]).eol().codebox(CODEBOX, "python", position=0).eol().get_node()
+    assert len(node.entities) == 2
+    assert node.entities[1] == node.tables[0]
+    assert node.entities[0] == node.codebox[0]
+
