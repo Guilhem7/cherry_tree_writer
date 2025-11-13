@@ -2,6 +2,38 @@
 Simple library to **Create**, **Read** or **Update** a **Cherrytree** document
 
 ## Usage
+
+### Basic functions
+
+```python
+from ctb_writer import CherryTree, CherryTreeNodeBuilder as NodeBuilder
+
+document = CherryTree() # Init the cherry tree document
+document.add_child("Name", # Name of the node or a CherryTreeNode
+                   text="Text", # Content of the node (optional)
+                   icon="ct_icon", # Icon to use (optional)
+                   is_ro=0, # Whether or not the node is readonly (optional)
+                   parent_id=0) # Id of the parent node (optional, 0 means no parentø)
+
+NodeBuilder("Name",
+            type="rich", # Type of the node, can be rich or plain or code
+            syntax=None, # Syntax of the node when type is code (example 'python')
+            color="green", # Color of the node's title
+            bold=True # Whether or not the node's title is in bold
+            ).image("path/to/image",
+                    position=-1, # Position of the image in the node (-1 means at the end)
+                    justification="left" # Where to put the image (left, center or right)
+            ).codebox("content",
+                      syntax="python" # Syntax of the codebox
+                      # Can also add other args such as position ot justification
+            ).table([["test"], ["Head"]] # Content of the table
+                    # Can also add other args such as position ot justification
+            ).texts("[(bold)]Bold[/]" # Simple Markup text that can be used
+            ).get_node() # Get the Node object that can be add to the document
+```
+
+### Examples
+
 ```python
 import os
 from ctb_writer import CherryTree, CherryTreeNodeBuilder as NodeBuilder
