@@ -223,11 +223,15 @@ class CherryTreeNode(_CherryTreeNodeBase):
     def _get_text_length(self):
         """
         Recover the length of the text inside the xml
+
+        It must be noted that the text length also take into
+        account entities. For instance an image in a node, increase
+        the text length by one.
         """
         length = 0
         for text in self.xml.itertext():
             length += len(text)
-        return length  
+        return length + len(self.images) + len(self.codebox) + len(self.tables)
 
     @property
     def has_image(self):
