@@ -4,7 +4,7 @@ with open("README.md", "r") as readme:
       description = readme.read()
 
 setup(name='cherry_tree_writer',
-      version='0.4',
+      version='0.41',
       description='Minimalist Python library for writting cherrytree document',
       author='Guilhem RIOUX',
       packages=find_packages(where="src"),
